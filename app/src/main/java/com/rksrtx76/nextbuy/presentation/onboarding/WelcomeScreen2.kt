@@ -56,9 +56,4 @@ fun WelcomeScreen2(
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//private fun WelcomeScreen2Prev() {
-//    WelcomeScreen2()
-//}
 
