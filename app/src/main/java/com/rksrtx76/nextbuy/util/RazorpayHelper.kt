@@ -20,9 +20,9 @@ object RazorpayHelper {
             put("description", "Test Order")
             put("currency", "INR")
             put("amount", (amount * 100).toInt()) // accepts in paisa
-//            put("theme", JSONObject().apply {
-//                put("color", "#F83758")
-//            })
+            put("theme", JSONObject().apply {
+                put("color", "#F83758")
+            })
 
         }
         checkOut.open(activity, options)
