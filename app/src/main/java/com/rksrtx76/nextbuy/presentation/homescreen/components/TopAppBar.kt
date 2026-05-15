@@ -42,7 +42,7 @@ fun TopAppBar(
         },
         navigationIcon = {
             IconButton(
-                onClick = { /* Handle navigation icon click */ }
+                onClick = { /* To do */ }
             ) {
                 Image(
                     painter = painterResource(R.drawable.hamburger_menu),
@@ -78,8 +78,5 @@ fun TopAppBar(
                 }
             }
         },
-//        colors = TopAppBarDefaults.topAppBarColors(
-//            containerColor = Color.White
-//        )
     )
 }

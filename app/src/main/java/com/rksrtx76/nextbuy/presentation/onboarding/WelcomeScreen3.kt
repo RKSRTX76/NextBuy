@@ -33,7 +33,7 @@ fun WelcomeScreen3(
             totalPage = 3,
             onSkip = {
                 navController.navigate(Routes.SignInScreen){
-                    popUpTo(Routes.WelcomeScreen1){
+                    popUpTo<Routes.WelcomeScreen1>{
                         inclusive = true
                     }
                 }

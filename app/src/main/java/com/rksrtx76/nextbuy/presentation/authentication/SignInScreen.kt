@@ -3,6 +3,8 @@ package com.rksrtx76.nextbuy.presentation.authentication
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -54,24 +56,26 @@ fun SignInScreen(
     var errorMessage by remember { mutableStateOf("") }
     val authState by authViewModel.authState.collectAsState()
 
+    val interactionSource = remember { MutableInteractionSource() }
+
     LaunchedEffect(authState) {
         when (val currState = authState){
             is Result.Success -> {
                 navController.navigate(Routes.HomeScreen){
-                    popUpTo(Routes.SignInScreen){
+                    popUpTo<Routes.SignInScreen>{
                         inclusive = true
                     }
                 }
             }
             is Result.Error -> {
+                errorMessage = "Invalid username or password"
                 showError = true
-                errorMessage = currState.message
             }
             is Result.Loading -> {
                     // Loading Indicator handled inside button
             }
             null ->{
-                // I created null branch because in initial state I do not have any state, so I mark as null
+                // Created null branch because in initial state I do not have any state, so I mark as null
             }
         }
     }
@@ -124,16 +128,18 @@ fun SignInScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
-                TextButton(
-                    onClick = { navController.navigate(Routes.ForgotPasswordScreen)},
-                    contentPadding = PaddingValues(0.dp)   // removed TextButton default padding
-                ) {
-                    Text(
-                        text = "Forgot Password?",
-                        fontSize = 14.sp,
-                        color = Color(0xFFF83758),
-                    )
-                }
+                Text(
+                    text = "Forgot Password?",
+                    fontSize = 14.sp,
+                    color = Color(0xFFF83758),
+                    modifier = Modifier
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ){
+                            navController.navigate(Routes.ForgotPasswordScreen)
+                        }
+                )
             }
         }
 
@@ -144,7 +150,6 @@ fun SignInScreen(
             isLoading = authState is Result.Loading,
             enabled = email.isNotBlank() && password.isNotBlank(),
             onClick = {
-                // do authentication
                 authViewModel.signIn(email,password)
             }
         )
@@ -152,7 +157,7 @@ fun SignInScreen(
         Spacer(modifier = Modifier.height(64.dp))
 
         SignInArea(
-            text = "Don't have an account?",
+            text = "Don't have an account? ",
             signInText = "Sign Up",
             onClick = {
                 navController.navigate(Routes.SignUpScreen)
@@ -162,14 +167,3 @@ fun SignInScreen(
 
     }
 }
-
-
-
-
-
-
-//@Preview(showSystemUi = true, showBackground = true)
-//@Composable
-//private fun SignInScreenPrev() {
-//    SignInScreen()
-//}

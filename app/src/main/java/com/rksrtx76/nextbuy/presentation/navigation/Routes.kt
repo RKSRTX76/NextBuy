@@ -1,6 +1,7 @@
 package com.rksrtx76.nextbuy.presentation.navigation
 
 import kotlinx.serialization.Serializable
+import okhttp3.Route
 
 @Serializable
 sealed class Routes{
@@ -48,6 +49,15 @@ sealed class Routes{
 
     @Serializable
     data object WishlistScreen : Routes()
+
+    @Serializable
+    data class AddressScreen(val amount : Double) : Routes()
+
+    @Serializable
+    data class PaymentSuccessScreen(val paymentId : String, val amount : Double) : Routes()
+
+    @Serializable
+    data class PaymentFailedScreen(val errorMessage : String, val amount : Double) : Routes()
 }
 
 

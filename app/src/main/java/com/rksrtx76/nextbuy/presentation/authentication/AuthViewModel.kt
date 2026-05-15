@@ -31,7 +31,7 @@ class AuthViewModel @Inject constructor(
     private val getUserProfileUseCase: GetUserProfileUseCase
 ) : ViewModel() {
 
-    // assigning null because I do not have Idle state in Resource and for authentication I can use initial state as Loading
+    // assigning null because We do not have Idle state in Resource and for authentication I can use initial state as Loading
     private val _authState = MutableStateFlow<Result<String>?>(null)
     val authState = _authState.asStateFlow()
 
@@ -40,13 +40,8 @@ class AuthViewModel @Inject constructor(
     fun signIn(email : String, password : String){
         _authState.value = Result.Loading
         viewModelScope.launch {
-            // no need try catch again because we handled exceptions for authentication in authRepository
             val result = signInUseCase(email, password)
             _authState.value = result
-//            if(result is Result.Success){
-//                setUserPreferenceUseCase.setFirstTimeLogin(false)
-//                setUserPreferenceUseCase.setLoggedIn(true)
-//            }
         }
     }
 
@@ -63,24 +58,6 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    // old way
-//    fun signInWithGoogle(account: GoogleSignInAccount){
-//        _authState.value = Result.Loading
-//        viewModelScope.launch(Dispatchers.IO) {
-//            try {
-//                val result = googleSignInUseCase(account)
-//                _authState.value = result
-//                if(result is Result.Success){
-//                    setUserPreferenceUseCase.setFirstTimeLogin(false)
-//                    setUserPreferenceUseCase.setLoggedIn(true)
-//                }
-//            }catch (e : Exception){
-//                _authState.value = Result.Error(e.message ?: "Google sign-in failed")
-//            }
-//        }
-//    }
-
-    // New way
     fun signInWithGoogle(idToken : String){
         _authState.value = Result.Loading
         viewModelScope.launch {
@@ -109,7 +86,7 @@ class AuthViewModel @Inject constructor(
                     userId = currentUser.uid,
                     email = currentUser.email.orEmpty(),
                     profilePhotoUrl = currentUser.photoUrl?.toString().orEmpty(),
-                    password = "",       // never store plain password
+                    password = "",       // never store as plain password
                     firstName = "",
                     lastName = "",
                     phoneNumber = "",

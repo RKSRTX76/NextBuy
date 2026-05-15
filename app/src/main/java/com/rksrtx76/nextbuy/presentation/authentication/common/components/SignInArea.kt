@@ -4,6 +4,8 @@ import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,7 +40,9 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.rksrtx76.nextbuy.R
 import com.rksrtx76.nextbuy.presentation.authentication.AuthViewModel
+import com.rksrtx76.nextbuy.presentation.navigation.Routes
 import kotlinx.coroutines.launch
+import kotlin.math.sign
 
 @Composable
 fun SignInArea(
@@ -49,6 +53,7 @@ fun SignInArea(
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val interactionSource = remember { MutableInteractionSource() }
     val credentialManager = remember{
         CredentialManager.create(context)
     }
@@ -107,14 +112,18 @@ fun SignInArea(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(text = text)
-                TextButton(
-                    onClick = onClick
-                ) {
-                    Text(
-                        text = signInText,
-                        color = Color(0xFFF83758)
-                    )
-                }
+                Text(
+                    text = signInText,
+                    fontSize = 14.sp,
+                    color = Color(0xFFF83758),
+                    modifier = Modifier
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ){
+                            onClick()
+                        }
+                )
             }
         }
     }
@@ -133,7 +142,6 @@ fun ImageContainer(
             .height(48.dp)
             .border(1.dp,Color.Black.copy(alpha = 0.25f),RoundedCornerShape(6.dp))
             .clickable{
-                // Todo: Add Google Sign-In
                 onGoogleSignIn()
             }
     ){

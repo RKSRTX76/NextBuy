@@ -39,6 +39,7 @@ import com.rksrtx76.nextbuy.presentation.navigation.Routes
 import com.rksrtx76.nextbuy.presentation.wishlist.WishlistViewModel
 import com.rksrtx76.nextbuy.util.Result
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -165,6 +166,9 @@ fun ProductDetailScreen(
                             },
                             onGoToCart = {
                                 navController.navigate(Routes.CartScreen)
+                            },
+                            onBuyNow = {
+                                navController.navigate(Routes.AddressScreen(amount = product.discountedPrice.roundToInt().toDouble()))
                             }
                         )
                     }

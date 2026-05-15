@@ -30,7 +30,8 @@ import kotlin.compareTo
 fun AddToCartSection(
     product: Product,
     onAddToCart: () -> Unit,
-    onGoToCart : () -> Unit
+    onGoToCart : () -> Unit,
+    onBuyNow : () -> Unit
 ){
     var isAddedToCart by remember { mutableStateOf(false) }
 
@@ -86,7 +87,7 @@ fun AddToCartSection(
 
 
         Button(
-            onClick = { },
+            onClick = onBuyNow,
             modifier = Modifier
                 .weight(1f)
                 .height(50.dp),

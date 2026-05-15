@@ -23,6 +23,7 @@ import com.rksrtx76.nextbuy.presentation.authentication.AuthViewModel
 import com.rksrtx76.nextbuy.presentation.authentication.ForgotPasswordScreen
 import com.rksrtx76.nextbuy.presentation.authentication.SignInScreen
 import com.rksrtx76.nextbuy.presentation.authentication.SignUpScreen
+import com.rksrtx76.nextbuy.presentation.cart.AddressScreen
 import com.rksrtx76.nextbuy.presentation.cart.CartScreen
 import com.rksrtx76.nextbuy.presentation.cart.CartViewModel
 import com.rksrtx76.nextbuy.presentation.detailscreen.ProductDetailScreen
@@ -31,16 +32,25 @@ import com.rksrtx76.nextbuy.presentation.homescreen.ProductViewModel
 import com.rksrtx76.nextbuy.presentation.onboarding.WelcomeScreen1
 import com.rksrtx76.nextbuy.presentation.onboarding.WelcomeScreen2
 import com.rksrtx76.nextbuy.presentation.onboarding.WelcomeScreen3
+import com.rksrtx76.nextbuy.presentation.paymentSuccessfull.PaymentFailedScreen
+import com.rksrtx76.nextbuy.presentation.paymentSuccessfull.PaymentSuccessScreen
+import com.rksrtx76.nextbuy.presentation.paymentSuccessfull.PaymentViewModel
 import com.rksrtx76.nextbuy.presentation.search.SearchScreen
 import com.rksrtx76.nextbuy.presentation.splash.SplashScreen
 import com.rksrtx76.nextbuy.presentation.userpreference.UserPreferencesViewModel
 import com.rksrtx76.nextbuy.presentation.userprofile.UserProfileScreen
 import com.rksrtx76.nextbuy.presentation.wishlist.WishlistScreen
 import com.rksrtx76.nextbuy.presentation.wishlist.WishlistViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import kotlin.math.roundToInt
 
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    paymentViewModel: PaymentViewModel
+) {
     val navController = rememberNavController()
 
     val authViewModel = hiltViewModel<AuthViewModel>()
@@ -151,7 +161,62 @@ fun AppNavigation() {
                             else -> Routes.SignInScreen
                         }
                         navController.navigate(destination){
-                            popUpTo(Routes.SplashScreen){
+                            popUpTo<Routes.SplashScreen>{
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+            }
+
+            composable<Routes.AddressScreen> { navBackstackEntry ->
+                val args = navBackstackEntry.toRoute<Routes.AddressScreen>()
+                AddressScreen(
+                    navController = navController,
+                    amount = args.amount,
+                    cartViewModel = cartViewModel,
+                    paymentViewModel = paymentViewModel
+                )
+            }
+
+            composable<Routes.PaymentSuccessScreen> { navBackstackEntry ->
+                val args = navBackstackEntry.toRoute<Routes.PaymentSuccessScreen>()
+                val dateTime = remember {
+                    SimpleDateFormat("dd MMM yy , hh:mm a", Locale.getDefault()).format(Date())
+                }
+                PaymentSuccessScreen(
+                    amount = "₹${args.amount.roundToInt()}",
+                    paymentId = args.paymentId,
+                    dateTime = dateTime,
+                    onDoneClick = {
+                        navController.navigate(Routes.HomeScreen){
+                            popUpTo<Routes.HomeScreen>{
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+            }
+
+            composable<Routes.PaymentFailedScreen>(){ navBackstackEntry->
+                val args = navBackstackEntry.toRoute<Routes.PaymentFailedScreen>()
+                val dateTime = remember {
+                    SimpleDateFormat("dd MMM yy , hh:mm a", Locale.getDefault()).format(Date())
+                }
+                PaymentFailedScreen(
+                    amount = "₹${args.amount.roundToInt()}",
+                    errorMessage = args.errorMessage,
+                    dateTime = dateTime,
+                    onRetryClick = {
+                        navController.navigate(Routes.AddressScreen(amount = args.amount.roundToInt().toDouble())){
+                            popUpTo<Routes.CartScreen>{
+                                inclusive = true
+                            }
+                        }
+                    },
+                    onCancelClick = {
+                        navController.navigate(Routes.HomeScreen){
+                            popUpTo<Routes.HomeScreen> {
                                 inclusive = true
                             }
                         }

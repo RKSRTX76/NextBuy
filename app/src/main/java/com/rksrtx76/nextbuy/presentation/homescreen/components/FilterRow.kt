@@ -42,7 +42,7 @@ fun FilterRow(
     ) {
         Row {
             TextButton(
-                onClick = { /* Handle sort */ }
+                onClick = { /* To do */ }
             ) {
                 Text("Sort")
                 Spacer(modifier = Modifier.width(4.dp))

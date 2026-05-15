@@ -127,7 +127,7 @@ fun CartScreen(
                     totalPrice = state.totalPrice,
                     totalItems = state.totalItems,
                     onCheckout = {
-                        // Navigate to checkout screen
+                        navController.navigate(Routes.AddressScreen(amount = state.totalPrice.roundToInt().toDouble()))
                     }
                 )
             }
@@ -413,9 +413,6 @@ fun CartItemCard(
             }
         }
 
-
-
-
     }
 }
 
@@ -465,7 +462,7 @@ fun CartBottomBar(
                         .width(160.dp)
                 ) {
                     Text(
-                        text = "Checkout",
+                        text = "Place Order",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )

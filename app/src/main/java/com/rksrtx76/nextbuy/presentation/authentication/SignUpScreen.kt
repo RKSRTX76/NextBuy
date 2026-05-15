@@ -1,5 +1,6 @@
 package com.rksrtx76.nextbuy.presentation.authentication
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,21 +46,24 @@ fun SignUpScreen(
 
     val authState by authViewModel.authState.collectAsState()
 
+
+
     LaunchedEffect(authState) {
         when (val currState = authState){
             is Result.Success -> {
                 navController.navigate(Routes.HomeScreen){
-                    popUpTo(Routes.SignUpScreen){
+                    popUpTo<Routes.SignUpScreen>{
                         inclusive = true
                     }
                 }
                 // reset authState (if we do not reset what will happen is when navigate login screen ,
-                // logic screen launchEffect runs, as Resource is Success it redirects to Homescreen)
+                // login screen launchEffect runs, as Resource is Success it redirects to Homescreen)
                 // to avoid that we reset state before going to Sign-in screen
 //                authViewModel.resetAuthState()
             }
             is Result.Error -> {
                 errorMessage = currState.message
+                showError = true
             }
             is Result.Loading -> {
                 // Loading Indicator handled inside button
@@ -127,8 +131,6 @@ fun SignUpScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
         if(showError){
             Text(
                 text = errorMessage,
@@ -137,6 +139,8 @@ fun SignUpScreen(
                 modifier = Modifier.padding(8.dp)
             )
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         CustomButton(
             text = "Create Account",
@@ -155,7 +159,7 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(60.dp))
 
         SignInArea(
-            text = "I already have an account",
+            text = "I already have an account ",
             signInText = "Login",
             onClick = {
                 navController.navigate(Routes.SignInScreen)
@@ -165,12 +169,3 @@ fun SignUpScreen(
     }
 }
 
-
-//@Preview(showSystemUi = true, showBackground = true)
-//@Composable
-//private fun SignUpScreenPrev() {
-//    SignUpScreen(
-//        navController = rememberNavController()
-//    )
-//
-//}

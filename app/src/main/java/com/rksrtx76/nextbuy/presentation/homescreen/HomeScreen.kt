@@ -198,15 +198,3 @@ fun HomeScreen(
         }
     }
 }
-
-
-
-
-
-
-
-//@Preview(showSystemUi = true, showBackground = true)
-//@Composable
-//fun HomeScreenPrev(){
-//    HomeScreen()
-//}

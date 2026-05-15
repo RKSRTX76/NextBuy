@@ -308,7 +308,7 @@ fun UserProfileScreen(
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
-                SectionHeader("Business Address Details")
+                SectionHeader("Address Details")
 
                 Spacer(modifier = Modifier.height(12.dp))
 
