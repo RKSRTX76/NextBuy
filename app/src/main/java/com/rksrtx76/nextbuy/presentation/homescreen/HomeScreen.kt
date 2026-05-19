@@ -84,17 +84,6 @@ fun HomeScreen(
     var searchQuery by remember { mutableStateOf("") }
     var showCategoryFilter by remember { mutableStateOf(false) }
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) {
-        /* granted or denied — notification will silently skip if denied */
-    }
-
-    LaunchedEffect(Unit) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-            permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-        }
-    }
 
     Scaffold(
         topBar = {

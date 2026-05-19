@@ -1,7 +1,11 @@
 package com.rksrtx76.nextbuy.presentation.navigation
 
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -59,6 +63,18 @@ fun AppNavigation(
     val productViewModel = hiltViewModel<ProductViewModel>()
     val wishlistViewModel = hiltViewModel<WishlistViewModel>()
     val cartViewModel = hiltViewModel<CartViewModel>()
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) {
+        /* granted or denied — notification will silently skip if denied */
+    }
+
+    LaunchedEffect(Unit) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
 
     Scaffold{ innerPadding ->
         NavHost(
