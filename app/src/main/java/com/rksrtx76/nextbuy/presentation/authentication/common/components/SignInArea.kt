@@ -1,6 +1,9 @@
 package com.rksrtx76.nextbuy.presentation.authentication.common.components
 
 import android.app.Activity
+import android.content.Intent
+import android.provider.Settings
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,9 +37,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.NoCredentialException
 
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.rksrtx76.nextbuy.R
 import com.rksrtx76.nextbuy.presentation.authentication.AuthViewModel
@@ -53,20 +59,11 @@ fun SignInArea(
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val activity = context as? Activity ?: return
     val interactionSource = remember { MutableInteractionSource() }
     val credentialManager = remember{
-        CredentialManager.create(context)
+        CredentialManager.create(activity)
     }
-
-    // Google Sign-In Launcher
-    val googleIdOption = GetGoogleIdOption.Builder()
-        .setFilterByAuthorizedAccounts(false)
-        .setServerClientId(context.getString(R.string.default_web_client_id))
-        .build()
-
-    val googleSignInRequest = GetCredentialRequest.Builder()
-        .addCredentialOption(googleIdOption)
-        .build()
 
     Box(
         modifier = Modifier.fillMaxWidth(),
@@ -89,17 +86,60 @@ fun SignInArea(
                     onGoogleSignIn = {
                         scope.launch {
                             try {
+                                // Google Sign-In Launcher (GetGoogleIdOption used for mini credential manager)
+                                // Pass 1: Try fast one-tap for existing/authorized accounts
+                                val googleIdOption = GetGoogleIdOption.Builder()
+                                    .setFilterByAuthorizedAccounts(true)
+                                    .setServerClientId(context.getString(R.string.default_web_client_id))
+                                    .build()
+
+                                val googleSignInRequest = GetCredentialRequest.Builder()
+                                    .addCredentialOption(googleIdOption)
+                                    .build()
+
                                 val result = credentialManager.getCredential(
                                     request = googleSignInRequest,
-                                    context = context as Activity
+                                    context = activity
                                 )
                                 val credential = result.credential
                                 val googleIdTokenCredential = GoogleIdTokenCredential
                                     .createFrom(credential.data)
                                 val idToken = googleIdTokenCredential.idToken
                                 authViewModel.signInWithGoogle(idToken)
-                            }catch (e : GetCredentialException){
-                                e.printStackTrace()
+
+
+                            }catch (e : NoCredentialException){
+                                // Pass 2: No authorized account found, show full sheet
+                                try {
+                                    // Google Sign-In Launcher (GetSignInWithGoogleOption used for full credential manager)
+                                    val googleIdOption = GetSignInWithGoogleOption.Builder(
+                                        context.getString(R.string.default_web_client_id)
+                                    ).build()
+                                    val googleSignInRequest = GetCredentialRequest.Builder()
+                                        .addCredentialOption(googleIdOption)
+                                        .build()
+
+                                    val result = credentialManager.getCredential(
+                                        request = googleSignInRequest,
+                                        context = activity
+                                    )
+                                    val credential = result.credential
+                                    val googleIdTokenCredential = GoogleIdTokenCredential
+                                        .createFrom(credential.data)
+                                    val idToken = googleIdTokenCredential.idToken
+                                    authViewModel.signInWithGoogle(idToken)
+
+                                } catch (e: GetCredentialCancellationException) {
+                                    // User dismissed, do nothing
+                                } catch (e: GetCredentialException) {
+                                    Log.e("GoogleSignIn", "Fallback Error: ${e.message}")
+                                }
+
+                            } catch (e : GetCredentialCancellationException){
+                                // User dismissed , so do nothing
+                            }
+                            catch (e : GetCredentialException){
+                                Log.e("GoogleSignIn", "Credential Error : ${e.message}")
                             }
                         }
                     }
